@@ -1,0 +1,1662 @@
+openapi: 3.0.0
+info:
+  title: Petshop API
+  description: |-
+    Trata-se de uma API de Gerenciamento de Petshop.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor Local
+  - url: http://staging-api.example.com
+    description: Servidor Cloud
+tags:
+  - name: users
+    description: Operações sobre Usuários
+  - name: pets
+    description: Operações sobre Pets
+  - name: address
+    description: Operações sobre Endereços
+  - name: auth
+    description: Operações sobre Autenticação
+  - name: contact
+    description: Operações sobre Contatos
+  - name: delivery
+    description: Operações sobre Entregas
+  - name: products
+    description: Operações sobre Produtos
+  - name: purchase
+    description: Operações sobre Compras
+  - name: scheduling
+    description: Operações sobre Agendamentos
+paths:
+  /auth:
+    post:
+      summary: Autentica um usuário.
+      description: Autentica um usuário com base no e-mail e senha informados.
+      tags:
+        - auth
+      operationId: authenticateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        "200":
+          description: Usuário autenticado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /roles:
+    get:
+      summary: Retorna uma lista de papéis.
+      description: Retorna uma lista de todos os papéis disponíveis.
+      tags:
+        - roles
+      operationId: getRoles
+      security:
+        - bearerAuth: [ ]
+      responses:
+        "200":
+          description: Uma lista de papéis.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleResponse'
+    post:
+      summary: Cria um novo papel.
+      description: Cria um novo papel com base nos dados fornecidos.
+      tags:
+        - roles
+      operationId: createRole
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+      responses:
+        "201":
+          description: Papel criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponse'
+  /roles/{id}:
+    get:
+      summary: Retorna um papel específico.
+      description: Retorna os detalhes de um papel específico pelo ID.
+      tags:
+        - roles
+      operationId: getRoleById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detalhes do papel.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponse'
+    put:
+      summary: Atualiza um papel específico.
+      description: Atualiza os detalhes de um papel específico pelo ID.
+      tags:
+        - roles
+      operationId: updateRoleById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+      responses:
+        "200":
+          description: Papel atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponse'
+    delete:
+      summary: Exclui um papel específico.
+      description: Exclui um papel específico pelo ID.
+      tags:
+        - roles
+      operationId: deleteRoleById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Papel excluído com sucesso.
+  /schedulings:
+    get:
+      summary: Retorna uma lista de agendamentos.
+      description: Retorna uma lista de todos os agendamentos.
+      tags:
+        - scheduling
+      operationId: getSchedulings
+      security:
+        - bearerAuth: [ ]
+      responses:
+        "200":
+          description: Uma lista de agendamentos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Scheduling'
+    post:
+      summary: Cria um novo agendamento.
+      description: Cria um novo agendamento com base nos dados fornecidos.
+      tags:
+        - scheduling
+      operationId: createScheduling
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Scheduling'
+      responses:
+        "201":
+          description: Agendamento criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scheduling'
+  /schedulings/{id}:
+    get:
+      summary: Retorna um agendamento específico.
+      description: Retorna os detalhes de um agendamento específico pelo ID.
+      tags:
+        - scheduling
+      operationId: getSchedulingById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Detalhes do agendamento.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scheduling'
+    put:
+      summary: Atualiza um agendamento específico.
+      description: Atualiza os detalhes de um agendamento específico pelo ID.
+      tags:
+        - scheduling
+      operationId: updateSchedulingById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Scheduling'
+      responses:
+        "200":
+          description: Agendamento atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scheduling'
+    delete:
+      summary: Exclui um agendamento específico.
+      description: Exclui um agendamento específico pelo ID.
+      tags:
+        - scheduling
+      operationId: deleteSchedulingById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Agendamento excluído com sucesso.
+  /addresses:
+    get:
+      summary: Retorna uma lista de endereços.
+      description: Retorna uma lista de todos os endereços.
+      tags:
+        - address
+      operationId: getAddresses
+      security:
+        - bearerAuth: [ ]
+      responses:
+        "200":
+          description: Uma lista de endereços.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AddressResponse'
+    post:
+      summary: Cria um novo endereço.
+      description: Cria um novo endereço com base nos dados fornecidos.
+      tags:
+        - address
+      operationId: createAddress
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        "201":
+          description: Endereço criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+  /addresses/{id}:
+    get:
+      summary: Retorna um endereço específico.
+      description: Retorna os detalhes de um endereço específico pelo ID.
+      tags:
+        - address
+      operationId: getAddressById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Detalhes do endereço.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+    put:
+      summary: Atualiza um endereço específico.
+      description: Atualiza os detalhes de um endereço específico pelo ID.
+      tags:
+        - address
+      operationId: updateAddressById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        "200":
+          description: Endereço atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+    delete:
+      summary: Exclui um endereço específico.
+      description: Exclui um endereço específico pelo ID.
+      tags:
+        - address
+      operationId: deleteAddressById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Endereço excluído com sucesso.
+  /users:
+    get:
+      summary: Retorna uma lista de usuários.
+      description: Retorna uma lista de todos os usuários.
+      tags:
+        - users
+      operationId: getUsers
+      security:
+        - bearerAuth: [ ]
+      responses:
+        "200":
+          description: Uma lista de usuários.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+    post:
+      summary: Cria um novo usuário.
+      description: Cria um novo usuário com base nos dados fornecidos.
+      tags:
+        - users
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        "201":
+          description: Usuário criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  /users/{id}:
+    get:
+      summary: Retorna um usuário específico.
+      description: Retorna os detalhes de um usuário específico pelo ID.
+      tags:
+        - users
+      operationId: getUserById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detalhes do usuário.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    put:
+      summary: Atualiza um usuário específico.
+      description: Atualiza os detalhes de um usuário específico pelo ID.
+      tags:
+        - users
+      operationId: updateUserById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        "200":
+          description: Usuário atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    delete:
+      summary: Exclui um usuário específico.
+      description: Exclui um usuário específico pelo ID.
+      tags:
+        - users
+      operationId: deleteUserById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Usuário excluído com sucesso.
+  /products:
+    get:
+      summary: Retorna uma lista de produtos.
+      description: Retorna uma lista de todos os produtos.
+      tags:
+        - products
+      operationId: getProducts
+      security:
+        - bearerAuth: [ ]
+      responses:
+        "200":
+          description: Uma lista de produtos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+    post:
+      summary: Cria um novo produto.
+      description: Cria um novo produto com base nos dados fornecidos.
+      tags:
+        - products
+      operationId: createProduct
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        "201":
+          description: Produto criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+  /products/{id}:
+    get:
+      summary: Retorna um produto específico.
+      description: Retorna os detalhes de um produto específico pelo ID.
+      tags:
+        - products
+      operationId: getProductById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detalhes do produto.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+    put:
+      summary: Atualiza um produto específico.
+      description: Atualiza os detalhes de um produto específico pelo ID.
+      tags:
+        - products
+      operationId: updateProductById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        "200":
+          description: Produto atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+    delete:
+      summary: Exclui um produto específico.
+      description: Exclui um produto específico pelo ID.
+      tags:
+        - products
+      operationId: deleteProductById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Produto excluído com sucesso.
+  /update-password:
+    put:
+      summary: Atualiza a senha do usuário.
+      description: Atualiza a senha do usuário autenticado.
+      tags:
+        - auth
+      operationId: updatePassword
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePassword'
+      responses:
+        "200":
+          description: Senha atualizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+  /recover-password:
+    post:
+      summary: Recupera a senha do usuário.
+      description: Envia um token de recuperação de senha para o e-mail do usuário.
+      tags:
+        - auth
+      operationId: recoverPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        "200":
+          description: Token de recuperação enviado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+  /logout:
+    post:
+      summary: Faz logout do usuário.
+      description: Invalida o token de autenticação do usuário.
+      tags:
+        - auth
+      security:
+        - bearerAuth: [ ]
+      operationId: logoutUser
+      responses:
+        "200":
+          description: Logout realizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+  /pets:
+    get:
+      summary: Retorna uma lista de pets.
+      description: Retorna uma lista de todos os pets.
+      tags:
+        - pets
+      operationId: getPets
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: castrated
+          in: query
+          schema:
+            type: boolean
+        - name: species
+          in: query
+          schema:
+            type: string
+        - name: gender
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Uma lista de pets.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PetResponse'
+    post:
+      summary: Cadastra um novo pet.
+      description: Cadastra um novo pet com base nos dados fornecidos.
+      tags:
+        - pets
+      operationId: createPet
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetRequest'
+      responses:
+        "201":
+          description: Pet cadastrado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetResponse'
+  /pets/{id}:
+    get:
+      summary: Retorna um pet específico.
+      description: Retorna os detalhes de um pet específico pelo ID.
+      tags:
+        - pets
+      operationId: getPetById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detalhes do pet.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetResponse'
+    put:
+      summary: Atualiza um pet específico.
+      description: Atualiza os detalhes de um pet específico pelo ID.
+      tags:
+        - pets
+      operationId: updatePetById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetRequest'
+      responses:
+        "200":
+          description: Pet atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetResponse'
+    patch:
+      summary: Atualiza um ou mais campos de um pet específico.
+      description: Atualiza um ou mais campos de um pet específico pelo ID.
+      tags:
+        - pets
+      operationId: patchPetById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetRequest'
+      responses:
+        "200":
+          description: Pet atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetResponse'
+    delete:
+      summary: Exclui um pet específico.
+      description: Exclui um pet específico pelo ID.
+      tags:
+        - pets
+      operationId: deletePetById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Pet excluído com sucesso.
+  /delivery:
+    post:
+      summary: Cria uma nova entrega.
+      description: Cria uma nova entrega com base nos dados fornecidos.
+      tags:
+        - delivery
+      operationId: createDelivery
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDeliveryInfo'
+      responses:
+        "201":
+          description: Entrega criada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+  /contact:
+    post:
+      summary: Envia uma mensagem de contato.
+      description: Envia uma mensagem de contato para o suporte.
+      tags:
+        - contact
+      operationId: sendContactMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactForm'
+      responses:
+        "200":
+          description: Mensagem enviada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+  /pets/user:
+    get:
+      summary: Retorna os pets cadastrados pelo usuário autenticado.
+      description: Retorna uma lista de pets cadastrados pelo usuário autenticado.
+      tags:
+        - pets
+      operationId: getUserPets
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Uma lista de pets cadastrados pelo usuário autenticado.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PetResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+components:
+  schemas:
+    AddressRequest:
+      type: object
+      required:
+        - zipCode
+        - state
+        - city
+        - street
+      properties:
+        street:
+          type: string
+          minLength: 3
+          example: Rua das Flores
+          description: Rua
+        number:
+          type: string
+          example: 123
+          description: Número
+        complement:
+          type: string
+          example: Casa
+          description: Complemento
+        neighborhood:
+          type: string
+          minLength: 3
+          example: Jardim das Rosas
+          description: Bairro
+        city:
+          type: string
+          minLength: 3
+          example: São Paulo
+          description: Cidade
+        state:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          example: SP
+          description: Estado
+        country:
+          type: string
+          example: Brasil
+          description: País
+        zipCode:
+          type: string
+          pattern: '\\d{8}$'
+          example: 12345678
+          description: CEP
+    AddressResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador
+        street:
+          type: string
+          minLength: 3
+          example: Rua das Flores
+          description: Rua
+        number:
+          type: string
+          example: 123
+          description: Número
+        complement:
+          type: string
+          example: Casa
+          description: Complemento
+        neighborhood:
+          type: string
+          minLength: 3
+          example: Jardim das Rosas
+          description: Bairro
+        city:
+          type: string
+          minLength: 3
+          example: São Paulo
+          description: Cidade
+        state:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          example: SP
+          description: Estado
+        country:
+          type: string
+          example: Brasil
+          description: País
+        zip_code:
+          type: string
+          pattern: '\\d{8}$'
+          example: 12345678
+          description: CEP
+    ContactForm:
+      type: object
+      required:
+        - name
+        - email
+        - message
+      properties:
+        name:
+          type: string
+          minLength: 3
+          example: João da Silva
+          description: Nome
+        email:
+          type: string
+          format: email
+          example:
+        message:
+          type: string
+          minLength: 3
+          example: Olá, gostaria de saber mais sobre os serviços oferecidos.
+          description: Mensagem
+    Dimensions:
+      type: object
+      properties:
+        width:
+          type: number
+          format: float
+          example: 0.5
+          description: Largura
+        height:
+          type: number
+          format: float
+          example: 0.5
+          description: Altura
+        length:
+          type: number
+          format: float
+          example: 0.5
+          description: Comprimento
+    Login:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: username@email.com
+          description: E-mail
+        password:
+          type: string
+          format: password
+          example: password
+          description: Senha
+    PasswordResetToken:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        token:
+          type: string
+          default: 6
+          example: 123456
+          description: Token
+        expiration:
+          type: string
+          format: date-time
+          example: 2021-12-31T23:59:59
+          description: Expiração
+    PetRequest:
+      type: object
+      required:
+        - name
+        - species
+        - gender
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Rex
+          description: Nome do Pet
+        species:
+          $ref: '#/components/schemas/Species'
+          example: DOG
+          description: Espécie
+        breed:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Labrador
+          description: Raça
+        birthDate:
+          type: string
+          format: date
+          example: 01/01/2020
+          description: Data de nascimento
+        color:
+          type: string
+          minLength: 3
+          maxLength: 25
+          example: Marrom
+          description: Cor
+        size:
+          type: string
+          minLength: 3
+          maxLength: 25
+          example: Grande
+          description: Tamanho (micro, pequeno, médio, grande, gigante)
+        gender:
+          $ref: '#/components/schemas/Gender'
+          example: Female
+          description: Gênero
+        castrated:
+          type: boolean
+          example: true
+          description: Castrado
+        weight:
+          type: number
+          example: 47.8
+          description: Peso
+        healthHistory:
+          type: string
+          minLength: 3
+          maxLength: 250
+          example: Cachorro tem alergia ao medicamento XPTO.
+          description: Histórico de Saúde
+    PetResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        name:
+          type: string
+          example: Rex
+          description: Nome do Pet
+        species:
+          $ref: '#/components/schemas/Species'
+          example: DOG
+          description: Espécie
+        breed:
+          type: string
+          example: Labrador
+          description: Raça
+        birth_date:
+          type: string
+          format: date
+          example: 01/01/2020
+          description: Data de nascimento
+        color:
+          type: string
+          example: Marrom
+          description: Cor
+        size:
+          type: string
+          example: Grande
+          description: Tamanho (micro, pequeno, médio, grande, gigante)
+        gender:
+          $ref: '#/components/schemas/Gender'
+          example: Female
+          description: Gênero
+        castrated:
+          type: boolean
+          example: true
+          description: Castrado
+        weight:
+          type: number
+          example: 47.8
+          description: Peso
+        health_history:
+          type: string
+          example: Cachorro tem alergia ao medicamento XPTO.
+          description: Histórico de Saúde
+    ProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - quantity
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Ração
+          description: Nome do Produto
+        price:
+          type: number
+          minimum: 0.01
+          maximum: 9999.99
+          example: 99.99
+          description: Preço
+        quantity:
+          type: number
+          minimum: 1
+          maximum: 9999
+          description: Quantidade
+        category:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Alimento
+          description: Categoria
+        supplier:
+          type: string
+          minLength: 3
+          maxLength: 150
+          example: PetShop XYZ
+          description: Fornecedor
+        expirationDate:
+          type: string
+          format: date
+          example: Ração para cães adultos
+          description: Descrição
+        barcode:
+          type: string
+          minLength: 3
+          maxLength: 150
+          example: Ração para cães adultos
+          description: Descrição
+        weight:
+          type: number
+          example: Ração para cães adultos
+          description: Descrição
+        dimensions:
+          $ref: '#/components/schemas/Dimensions'
+          description: Dimensões
+        purchase:
+          type: string
+          description: Descrição
+        imageUrl:
+          type: string
+          format: uri
+          example: https://www.petshop.com.br/imagens/123.jpg
+          description: URL da Imagem
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        name:
+          type: string
+          example: Ração
+          description: Nome do Produto
+        price:
+          type: number
+          example: 99.99
+          description: Preço
+        quantity:
+          type: number
+          example: 10
+          description: Quantidade
+        category:
+          type: string
+          example: Alimento
+          description: Categoria
+        supplier:
+          type: string
+          example: PetShop XYZ
+          description: Fornecedor
+        expiration_date:
+          type: string
+          format: date
+          example: Ração para cães adultos
+          description: Descrição
+        barcode:
+          type: string
+          example: Ração para cães adultos
+          description: Descrição
+        weight:
+          type: number
+          example: Ração para cães adultos
+          description: Descrição
+        dimensions:
+          $ref: '#/components/schemas/Dimensions'
+          description: Dimensões
+        purchase:
+          type: string
+          description: Descrição
+        image_url:
+          type: string
+          format: uri
+          example: https://www.petshop.com.br/imagens/123.jpg
+          description: URL da Imagem
+        age:
+          type: integer
+          format: int32
+          example: 1
+          description: Idade
+    PurchaseRequest:
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRequest'
+    PurchaseResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRequest'
+        purchase_date:
+          type: string
+          format: date
+          example: 01/01/2021
+          description: Data da Compra
+    RoleRequest:
+      type: object
+      required:
+        - name
+        - permissions
+      properties:
+        name:
+          type: string
+          $ref: '#/components/schemas/RoleType'
+        description:
+          type: string
+          minLength: 3
+          maxLength: 250
+          example: Administrador do Sistema
+          description: Descrição
+    RoleResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        name:
+          type: string
+          $ref: '#/components/schemas/RoleType'
+        description:
+          type: string
+          example: Administrador do Sistema
+          description: Descrição
+    Scheduling:
+      type: object
+    Token:
+      type: object
+      properties:
+        auth_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+          description: Token
+        token_type:
+          type: string
+          example: Bearer
+          description: Tipo
+        expiration_in:
+          type: string
+          format: date-time
+          example: 2021-12-31T23:59:59
+          description: Expiração
+        username:
+          type: string
+          example: username
+          description: Usuário
+        name:
+          type: string
+          example: João da Silva
+          description: Nome
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponse'
+          description: Papéis
+    UpdatePassword:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+        - confirmNewPassword
+      properties:
+        oldPassword:
+          type: string
+          format: password
+          example: password
+          description: Senha Antiga
+        newPassword:
+          type: string
+          format: password
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+          example: password
+          description: Nova Senha
+        confirmNewPassword:
+          type: string
+          format: password
+          example: password
+          description: Confirmação de Nova Senha
+    UserRequest:
+      type: object
+      required:
+        - name
+        - email
+        - cpf
+        - phone
+        - password
+        - confirmPassword
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: João da Silva
+          description: Nome
+        email:
+          type: string
+          format: email
+          example: joao.silva@email.com
+          description: E-mail
+        cpf:
+          type: string
+          pattern: '\\d{3}.\\d{3}.\\d{3}-\\d{2}'
+          example: 123.456.789-00
+          description: CPF
+        phone:
+          type: string
+          pattern: '^\+?\d{9,14}$'
+          example: (11) 99999-9999
+          description: Telefone
+        password:
+          type: string
+          format: password
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+          example: password
+          description: Senha
+        confirmPassword:
+          type: string
+          format: password
+          example: password
+          description: Confirmação de Senha
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        name:
+          type: string
+          example: João da Silva
+          description: Nome
+        email:
+          type: string
+          format: email
+          example: joao.silva@email.com
+          description: E-mail
+        cpf:
+          type: string
+          example: 123.456.789-00
+          description: CPF
+        phone:
+          type: string
+          example: (11) 99999-9999
+          description: Telefone
+        pets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PetResponse'
+          description: Pets
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponse'
+          description: Papéis
+        purchases:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseResponse'
+          description: Compras
+        address:
+          $ref: '#/components/schemas/AddressResponse'
+          description: Endereço
+    UserDeliveryInfo:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        user_name:
+          type: string
+          example: João da Silva
+          description: Nome do Usuário
+        user_email:
+          type: string
+          format: email
+          example: joao.silva@email.com
+        user_phone:
+          type: string
+          example: (11) 99999-9999
+          description: Telefone
+        address:
+          $ref: '#/components/schemas/AddressResponse'
+          description: Endereço
+    Gender:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
+        - OTHER
+      example: MALE
+      description: Gênero
+    ProfessionalInfo:
+      type: string
+      enum:
+        - VETERINARIAN
+        - ATTENDANT
+        - GROOMER
+        - TRAINER
+        - OTHER
+      example: VETERINARIAN
+      description: Informações Profissionais
+    RoleType:
+      type: string
+      enum:
+        - SUPER_ADMIN
+        - ADMIN
+        - USER
+        - OWNER
+        - CUSTOMER
+        - EMPLOYEE
+        - VETERINARIAN
+      example: SUPER_ADMIN
+      description: Tipo de Papel
+    SchedulingStatus:
+      type: string
+      enum:
+        - SCHEDULED
+        - CANCELED
+        - COMPLETED
+        - PENDING
+        - CONFIRMED
+        - RESCHEDULED
+      example: SCHEDULED
+      description: Status do Agendamento
+    ServiceType:
+      type: string
+      enum:
+        - BATH
+        - GROOMING
+        - BATH_GROOMING
+        - CONSULTATION
+        - VACCINATION
+        - OTHER
+      example: BATH
+      description: Tipo de Serviço
+    Species:
+      type: string
+      enum:
+        - DOG
+        - CAT
+        - BIRD
+        - FISH
+        - REPTILE
+        - RABBIT
+        - OTHER
+      example: DOG
+      description: Tipo de Espécie
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Operação realizada com sucesso.
+    PasswordResetRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: usuario@email.com
+          description: E-mail do usuário para recuperação de senha.
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-TOKEN
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
