@@ -1,0 +1,167 @@
+openapi: 3.0.0
+info:
+  title: Petshop API
+  description: |-
+    Trata-se de uma API de Gerenciamento de Petshop.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor Local
+  - url: http://staging-api.example.com
+    description: Servidor Cloud
+tags:
+  - name: contact
+    description: Operações sobre Contatos
+paths:
+  /contact:
+    post:
+      summary: Envia uma mensagem de contato.
+      description: Envia uma mensagem de contato para o suporte.
+      tags:
+        - contact
+      operationId: sendContactMessage
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactForm'
+      responses:
+        "200":
+          description: Mensagem enviada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+components:
+  schemas:
+    ContactForm:
+      type: object
+      required:
+        - name
+        - email
+        - message
+      properties:
+        name:
+          type: string
+          minLength: 3
+          example: João da Silva
+          description: Nome
+        email:
+          type: string
+          format: email
+          example:
+        message:
+          type: string
+          minLength: 3
+          example: Olá, gostaria de saber mais sobre os serviços oferecidos.
+          description: Mensagem
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Operação realizada com sucesso.
+    PasswordResetRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: usuario@email.com
+          description: E-mail do usuário para recuperação de senha.
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-TOKEN
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID

@@ -1,0 +1,32 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: UseJava@1
+    inputs:
+      versionSpec: '11'
+      jdkArchitecture: 'x64'
+
+  - script: |
+      mvn -B package --file pom.xml
+    displayName: 'Build with Maven'
+
+  - task: CopyFiles@2
+    inputs:
+      contents: 'target/petshop-api-0.0.1-SNAPSHOT.jar'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'drop'
+      publishLocation: 'Container'
+
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: '<your-azure-subscription>'
+      appName: '<your-app-name>'
+      package: '$(Build.ArtifactStagingDirectory)/petshop-api-0.0.1-SNAPSHOT.jar'

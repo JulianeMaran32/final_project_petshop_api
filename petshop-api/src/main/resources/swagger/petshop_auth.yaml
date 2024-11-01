@@ -1,0 +1,406 @@
+openapi: 3.0.0
+info:
+  title: Petshop API - Autenticação
+  description: |-
+    Trata-se de uma API de Gerenciamento de Petshop com foco em Autenticação.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor Local
+  - url: http://staging-api.example.com
+    description: Servidor Cloud
+tags:
+  - name: auth
+    description: Operações sobre Autenticação
+paths:
+  /auth/login:
+    post:
+      summary: Efetua login e retorna o cookie de autenticação.
+      description: Um objeto JSON contendo o login e a senha.
+      tags:
+        - auth
+      operationId: authenticateUser
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        "200":
+          description: |-
+            Usuário autenticado com sucesso.
+            O ID da sessão é retornado em um cookie chamado `JSESSIONID`. 
+            Você precisa incluir esse cookie em solicitações subsequentes.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: JSESSIONID=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /auth/me:
+    get:
+      summary: Obtém os detalhes do usuário autenticado.
+      description: Retorna as informações do usuário autenticado.
+      tags:
+        - auth
+      operationId: getUserDetails
+      security:
+        - bearerAuth: [ ]
+        - cookieAuth: [ ]
+      responses:
+        "200":
+          description: Detalhes do usuário retornados com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /auth/forgot-password:
+    post:
+      summary: Recupera a senha do usuário.
+      description: Envia um token de recuperação de senha para o e-mail do usuário.
+      tags:
+        - auth
+      operationId: recoverPassword
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: username@email.com
+      responses:
+        "200":
+          description: Token de recuperação enviado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+  /auth/reset-password:
+    post:
+      summary: Redefine a senha do usuário.
+      description: Valida o token de recuperação e redefine a senha do usuário.
+      tags:
+        - auth
+      operationId: resetPassword
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: 123456
+                new_password:
+                  type: string
+                  format: password
+                  example: newPassword123!
+                confirm_password:
+                  type: string
+                  format: password
+                  example: newPassword123!
+      responses:
+        "200":
+          description: Senha redefinida com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+  /logout:
+    post:
+      summary: Faz logout do usuário.
+      description: Invalida o token de autenticação do usuário.
+      tags:
+        - auth
+      security:
+        - bearerAuth: [ ]
+        - cookieAuth: [ ]
+      operationId: logoutUser
+      responses:
+        "200":
+          description: Logout realizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+components:
+  schemas:
+    Login:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: username@email.com
+          description: E-mail
+        password:
+          type: string
+          format: password
+          example: password
+          description: Senha
+    PasswordResetToken:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        token:
+          type: string
+          default: 6
+          example: 123456
+          description: Token
+        expiration:
+          type: string
+          format: date-time
+          example: 2021-12-31T23:59:59
+          description: Expiração
+    RoleResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador único
+        name:
+          type: string
+          $ref: '#/components/schemas/RoleType'
+        description:
+          type: string
+          example: Administrador do Sistema
+          description: Descrição
+    Token:
+      type: object
+      properties:
+        auth_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+          description: Token
+        token_type:
+          type: string
+          example: Bearer
+          description: Tipo
+        expiration_in:
+          type: string
+          format: date-time
+          example: 2021-12-31T23:59:59
+          description: Expiração
+        username:
+          type: string
+          example: username
+          description: Usuário
+        name:
+          type: string
+          example: João da Silva
+          description: Nome
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponse'
+          description: Papéis
+    UpdatePassword:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+        - confirmNewPassword
+      properties:
+        oldPassword:
+          type: string
+          format: password
+          example: password
+          description: Senha Antiga
+        newPassword:
+          type: string
+          format: password
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+          example: password
+          description: Nova Senha
+        confirmNewPassword:
+          type: string
+          format: password
+          example: password
+          description: Confirmação de Nova Senha
+    UserDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+          description: Identificador único
+        name:
+          type: string
+          example: Admin Petshop
+          description: Nome do usuário
+        cpf:
+          type: string
+          example: 496.325.820-04
+          description: CPF do usuário
+        email:
+          type: string
+          format: email
+          example: julianemaran@gmail.com
+          description: E-mail do usuário
+        phone:
+          type: string
+          example: null
+          description: Telefone do usuário
+        active:
+          type: boolean
+          example: true
+          description: Status de atividade do usuário
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponse'
+          description: Papéis do usuário
+    RoleType:
+      type: string
+      enum:
+        - SUPER_ADMIN
+        - ADMIN
+        - USER
+        - OWNER
+        - CUSTOMER
+        - EMPLOYEE
+        - VETERINARIAN
+      example: SUPER_ADMIN
+      description: Tipo de Papel
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Operação realizada com sucesso.
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-TOKEN
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID

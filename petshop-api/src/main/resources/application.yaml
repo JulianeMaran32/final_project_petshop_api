@@ -1,0 +1,150 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  error:
+    whitelabel:
+      enabled: false
+  max-http-request-header-size:
+    value: 10KB
+  tomcat:
+    connection-timeout: 2000
+
+spring:
+  application:
+    name: petshop-api
+  devtools:
+    restart:
+      enabled: true
+    add-properties: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/petshop?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: root
+    password: "root"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 'juliane.vmaran@gmail.com'
+    password: 'equu xelx wfjj sgrd'
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          from: 'juliane.vmaran@gmail.com'
+  gson:
+    date-format: "dd/MM/yyyy"
+  jackson:
+    locale: "pt_BR"
+    time-zone: "America/Sao_Paulo"
+    date-format: "dd/MM/yyyy"
+    default-property-inclusion: "NON_NULL"
+    property-naming-strategy: SNAKE_CASE
+    serialization:
+      INDENT_OUTPUT: true
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
+  banner:
+    charset: UTF-8
+    location: classpath:banner.txt
+  messages:
+    encoding: UTF-8
+    basename: "messages,config.i18n.messages"
+    fallback-to-system-locale: true
+  thymeleaf:
+    cache: false
+    mode: HTML
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+  cache:
+    type: simple
+#  cloud:
+#    openfeign:
+#      client:
+#        default:
+#          connect-timeout: 5000
+#          read-timeout: 5000
+#          logger-level: full
+#  flyway:
+#    enabled: true
+#    url: jdbc:mysql://localhost:3306/petshop_db?createDatabaseIfNotExist=true&serverTimezone=UTC&autoReconnect=true
+#    user: root
+#    password: "root"
+#    baseline-on-migrate: true
+#    baseline-version: "1"
+#    baseline-description: "Baseline inicial"
+#    encoding: UTF-8
+#    clean-disabled: true
+#    locations: classpath:db/migration
+#    schemas: public
+
+debug: true
+
+logging:
+  file:
+    name: "./logs/petshop-api.log"
+  config: classpath:logback.xml
+  charset:
+    file: UTF-8
+  include-application-name: true
+  level:
+    root: INFO
+    sql: DEBUG
+    web: DEBUG
+  register-shutdown-hook: false
+  pattern:
+    level: "%X{user} %5p"
+    date-format: "yyyy-MM-dd HH:mm"
+    file: "%d{date-format} [%thread] %-5level %logger{36} - %msg%n"
+
+info:
+  app:
+    artifactId: '@project.artifactId@'
+    group: '@project.groupId@'
+    name: '@project.name@'
+    description: '@project.description@'
+    version: '@project.version@'
+
+management:
+  server:
+    port: 9090
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,loggers,env,beans,mappings,openapi,swagger-ui"
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: true
+  use-management-port: false
+  default-consumes-media-type: application/json # request
+  default-produces-media-type: application/json # response
+
+petshop:
+  jwt:
+    expiration: 3600000 # 1 hora
+    secret-key: "+9U02KQNo4tAmOX3YxXOyw5ydsdrIeqxo6PyuAMFosU="
+  mail:
+    from:
+      name: 'PetFlow'
+  via-cep:
+    name: 'via-cep'
+    url: 'https://viacep.com.br/ws/'

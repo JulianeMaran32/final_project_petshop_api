@@ -1,0 +1,307 @@
+openapi: 3.0.0
+info:
+  title: Petshop API
+  description: |-
+    Trata-se de uma API de Gerenciamento de Petshop.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor Local
+  - url: http://staging-api.example.com
+    description: Servidor Cloud
+tags:
+  - name: address
+    description: Operações sobre Endereços
+paths:
+  /addresses:
+    get:
+      summary: Retorna uma lista de endereços.
+      description: Retorna uma lista de todos os endereços.
+      tags:
+        - address
+      operationId: getAddresses
+      security:
+        - bearerAuth: [ ]
+      responses:
+        "200":
+          description: Uma lista de endereços.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AddressResponse'
+    post:
+      summary: Cria um novo endereço.
+      description: Cria um novo endereço com base nos dados fornecidos.
+      tags:
+        - address
+      operationId: createAddress
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        "201":
+          description: Endereço criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+  /addresses/{id}:
+    get:
+      summary: Retorna um endereço específico.
+      description: Retorna os detalhes de um endereço específico pelo ID.
+      tags:
+        - address
+      operationId: getAddressById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Detalhes do endereço.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+    put:
+      summary: Atualiza um endereço específico.
+      description: Atualiza os detalhes de um endereço específico pelo ID.
+      tags:
+        - address
+      operationId: updateAddressById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        "200":
+          description: Endereço atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+    delete:
+      summary: Exclui um endereço específico.
+      description: Exclui um endereço específico pelo ID.
+      tags:
+        - address
+      operationId: deleteAddressById
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Endereço excluído com sucesso.
+components:
+  schemas:
+    AddressRequest:
+      type: object
+      required:
+        - zipCode
+        - state
+        - city
+        - street
+      properties:
+        street:
+          type: string
+          minLength: 3
+          example: Rua das Flores
+          description: Rua
+        number:
+          type: string
+          example: 123
+          description: Número
+        complement:
+          type: string
+          example: Casa
+          description: Complemento
+        neighborhood:
+          type: string
+          minLength: 3
+          example: Jardim das Rosas
+          description: Bairro
+        city:
+          type: string
+          minLength: 3
+          example: São Paulo
+          description: Cidade
+        state:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          example: SP
+          description: Estado
+        country:
+          type: string
+          example: Brasil
+          description: País
+        zipCode:
+          type: string
+          pattern: '\\d{8}$'
+          example: 12345678
+          description: CEP
+    AddressResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          description: Identificador
+        street:
+          type: string
+          minLength: 3
+          example: Rua das Flores
+          description: Rua
+        number:
+          type: string
+          example: 123
+          description: Número
+        complement:
+          type: string
+          example: Casa
+          description: Complemento
+        neighborhood:
+          type: string
+          minLength: 3
+          example: Jardim das Rosas
+          description: Bairro
+        city:
+          type: string
+          minLength: 3
+          example: São Paulo
+          description: Cidade
+        state:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          example: SP
+          description: Estado
+        country:
+          type: string
+          example: Brasil
+          description: País
+        zip_code:
+          type: string
+          pattern: '\\d{8}$'
+          example: 12345678
+          description: CEP
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Operação realizada com sucesso.
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-TOKEN
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
