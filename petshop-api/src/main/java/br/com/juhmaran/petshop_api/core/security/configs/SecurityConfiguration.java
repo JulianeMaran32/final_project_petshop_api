@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,76 +25,101 @@ import java.util.Arrays;
 import static br.com.juhmaran.petshop_api.core.security.constants.SecurityConstants.*;
 
 /**
+ * Configuração de segurança da aplicação.
+ * <p>
+ * Esta classe configura a cadeia de filtros de segurança, incluindo CSRF, CORS, autenticação JWT e políticas de sessão.
+ * </p>
+ *
  * @author Juliane Maran
  */
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@EnableGlobalAuthentication
 @EnableWebSecurity(debug = true)
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * Configura a cadeia de filtros de segurança.
+     *
+     * @param http o objeto HttpSecurity
+     * @return o bean SecurityFilterChain configurado
+     * @throws Exception se ocorrer um erro durante a configuração
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("Configurando a cadeia de filtros de segurança");
 
         var requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(session -> {
+            log.debug("Configurando a política de criação de sessão para STATELESS");
+            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        });
 
-        http.csrf(csrf -> csrf
-                .csrfTokenRepository(csrfTokenRepository())
-                .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/webjar/**", "/api/webjar/**")
-                .ignoringRequestMatchers("/", "/**", "/api", "/api/**")
-                .ignoringRequestMatchers("/api/swagger-ui*/**", "/api/swagger-ui/**",
-                        "/api/swagger-ui.html", "/api/swagger-ui/api-docs.html", "/api/swagger-ui/index.html",
-                        "/api/v3/api-docs", "/api/api-docs", "/api/swagger-ui*/*swagger-initializer.js")
-                .ignoringRequestMatchers("/api/error", "/api/errors")
-                .ignoringRequestMatchers("/api/actuator", "/api/actuator/**")
-                .ignoringRequestMatchers("classpath:/META-INF/resources/", "classpath:/resources/",
-                        "classpath:/static/", "classpath:/public/")
-                .ignoringRequestMatchers("/cache/contents")
-                .ignoringRequestMatchers("/auth/login", "/auth/forgot-password", "/auth/reset-password",
-                        "/contacts", "/users/register"));
+        http.csrf(csrf -> {
+            log.debug("Configurando CSRF");
+            csrf.csrfTokenRepository(csrfTokenRepository())
+                    .csrfTokenRequestHandler(requestHandler)
+                    .ignoringRequestMatchers(CLASSPATH)
+                    .ignoringRequestMatchers(URL_API)
+                    .ignoringRequestMatchers(URL_WEBJAR)
+                    .ignoringRequestMatchers(URL_SWAGGER)
+                    .ignoringRequestMatchers(URL_ERROR)
+                    .ignoringRequestMatchers(URL_ACTUATOR)
+                    .ignoringRequestMatchers(URL_CACHE)
+                    .ignoringRequestMatchers(URL_AUTH)
+                    .ignoringRequestMatchers(URL_CONTACT)
+                    .ignoringRequestMatchers(URL_USER_REGISTER);
+        });
 
-        http.authorizeHttpRequests(authz -> authz
-                .requestMatchers(HttpMethod.GET, "/public/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/webjar/**", "/api/webjar/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/", "/**", "/api", "/api/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/swagger-ui*/**", "/api/swagger-ui/**",
-                        "/api/swagger-ui.html", "/api/swagger-ui/api-docs.html", "/api/swagger-ui/index.html",
-                        "/api/v3/api-docs", "/api/api-docs", "/api/swagger-ui*/*swagger-initializer.js").permitAll()
-                .requestMatchers("/api/error", "/api/errors").permitAll()
-                .requestMatchers("/api/actuator", "/api/actuator/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/cache/contents").permitAll()
-                .requestMatchers(HttpMethod.GET, "/addresses/cep/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/addresses/search").permitAll()
-                .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/forgot-password").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/reset-password").permitAll()
-                .requestMatchers(HttpMethod.POST, "/contacts").permitAll()
-                .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
-                .anyRequest().authenticated());
+        http.authorizeHttpRequests(authz -> {
+            log.debug("Configurando autorizações de requisições HTTP");
+            authz.requestMatchers("/public/**").permitAll()
+                    .requestMatchers(URL_API).permitAll()
+                    .requestMatchers(URL_WEBJAR).permitAll()
+                    .requestMatchers(URL_ERROR).permitAll()
+                    .requestMatchers(URL_SWAGGER).permitAll()
+                    .requestMatchers(URL_ACTUATOR).permitAll()
+                    .requestMatchers(URL_AUTH).permitAll()
+                    .requestMatchers(URL_CONTACT).permitAll()
+                    .requestMatchers(HttpMethod.GET, URL_CACHE).permitAll()
+                    .requestMatchers(HttpMethod.POST, "/pets/register").hasRole("CUSTOMER")
+                    .anyRequest().authenticated();
+        });
 
-//        http.logout(logout -> logout.logoutUrl("/auth/logout")
-//                .invalidateHttpSession(true).deleteCookies(JSESSIONID, X_CSRF_TOKEN));
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        http.logout(logout -> {
+            log.debug("Configurando logout");
+            logout.logoutUrl("/auth/logout")
+                    .invalidateHttpSession(true).deleteCookies(JSESSIONID, X_CSRF_TOKEN);
+        });
+
+        http.cors(cors -> {
+            log.debug("Configurando CORS");
+            cors.configurationSource(corsConfigurationSource());
+        });
+
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        log.debug("Adicionando filtro de autenticação JWT antes do filtro de autenticação de usuário e senha");
+
         http.addFilterAfter(new CsrfCookieFilter(), UsernamePasswordAuthenticationFilter.class);
+        log.debug("Adicionando filtro de CSRF após o filtro de autenticação de usuário e senha");
 
         return http.build();
     }
 
+    /**
+     * Configura a fonte de configuração CORS.
+     *
+     * @return a fonte de configuração CORS configurada
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(LOCALHOST_4200, LOCALHOST_9090, VIA_CEP));
+        configuration.setAllowedOrigins(Arrays.asList(LOCALHOST_4200, LOCALHOST_9090, VIA_CEP, AZURE_API));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(AUTHORIZATION, CONTENT_TYPE, ACCEPT_LANGUAGE, X_CSRF_TOKEN));
         configuration.setExposedHeaders(Arrays.asList(AUTHORIZATION, CONTENT_TYPE, ACCEPT_LANGUAGE, X_CSRF_TOKEN));
@@ -106,6 +130,11 @@ public class SecurityConfiguration {
         return source;
     }
 
+    /**
+     * Configura o repositório de tokens CSRF.
+     *
+     * @return o repositório de tokens CSRF configurado
+     */
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
         var repository = new HttpSessionCsrfTokenRepository();

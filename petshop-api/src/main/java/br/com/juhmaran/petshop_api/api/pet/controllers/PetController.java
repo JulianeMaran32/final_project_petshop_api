@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -26,60 +27,63 @@ public class PetController {
 
     private final PetService petService;
 
-    @GetMapping
-    public ResponseEntity<List<PetResponse>> getPets(@RequestParam(required = false) String name,
-                                                     @RequestParam(required = false) Boolean castrated,
-                                                     @RequestParam(required = false) Species species,
-                                                     @RequestParam(required = false) Gender gender) {
-        List<PetResponse> pets = petService.getPets(name, castrated, species, gender);
-        return ResponseEntity.ok(pets);
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'SUPER_ADMIN', 'ADMIN', 'EMPLOYEE', 'VETERINARIAN')")
+    @GetMapping("/filter")
+    public ResponseEntity<List<PetResponse>> filterPets(
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String breed,
+            @RequestParam(required = false) Species species,
+            @RequestParam(required = false) Gender gender,
+            @RequestParam(required = false) LocalDateTime createdDate) {
+        List<PetResponse> pets = petService.filterPets(id, name, breed, species, gender, createdDate);
+        return new ResponseEntity<>(pets, HttpStatus.OK);
     }
 
-    @PostMapping("/admin")
-    public ResponseEntity<PetResponse> createPetForUser(@RequestParam(name = "user_id") Long userId,
-                                                        @RequestBody @Valid PetRequest petRequest) {
-        PetResponse petResponse = petService.createPetForUser(userId, petRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(petResponse);
-    }
-
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
-    public ResponseEntity<PetResponse> createPet(@RequestBody @Valid PetRequest petRequest,
+    public ResponseEntity<PetResponse> createPet(@Valid @RequestBody PetRequest petRequest,
                                                  Authentication authentication) {
         PetResponse petResponse = petService.createPet(petRequest, authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(petResponse);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PetResponse> getPetById(@PathVariable(name = "id") Long id) {
-        PetResponse petResponse = petService.getPetById(id);
-        return ResponseEntity.ok(petResponse);
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @PostMapping("/admin")
+    public ResponseEntity<PetResponse> createPetForCustomer(@Valid @RequestBody PetRequest petRequest) {
+        PetResponse petResponse = petService.createPetForCustomer(petRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(petResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PetResponse> updatePetById(@PathVariable(name = "id") Long id,
-                                                     @RequestBody @Valid PetRequest petRequest) {
-        PetResponse petResponse = petService.updatePetById(id, petRequest);
-        return ResponseEntity.ok(petResponse);
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @PutMapping("/{petId}")
+    public ResponseEntity<PetResponse> updatePet(@PathVariable Long petId,
+                                                 @Valid @RequestBody PetRequest petRequest,
+                                                 Authentication authentication) {
+        PetResponse petResponse = petService.updatePet(petId, petRequest, authentication.getName());
+        return ResponseEntity.status(HttpStatus.OK).body(petResponse);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<PetResponse> patchPetById(@PathVariable(name = "id") Long id,
-                                                    @RequestBody @Valid PetRequest petRequest) {
-        PetResponse petResponse = petService.patchPetById(id, petRequest);
-        return ResponseEntity.ok(petResponse);
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @PutMapping("/admin/{petId}")
+    public ResponseEntity<PetResponse> updatePetForCustomer(@PathVariable Long petId,
+                                                            @Valid @RequestBody PetRequest petRequest) {
+        PetResponse petResponse = petService.updatePetForCustomer(petId, petRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(petResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePetById(@PathVariable(name = "id") Long id) {
-        petService.deletePetById(id);
-        return ResponseEntity.noContent().build();
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @DeleteMapping("/{petId}")
+    public ResponseEntity<Void> deletePet(@PathVariable Long petId, Authentication authentication) {
+        petService.deletePet(petId, authentication.getName());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<List<PetResponse>> getUserPets(@RequestParam(required = false) String name) {
-        List<PetResponse> pets = petService.getUserPets(name);
-        return ResponseEntity.ok(pets);
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @DeleteMapping("/admin/{petId}")
+    public ResponseEntity<Void> deletePetForCustomer(@PathVariable Long petId) {
+        petService.deletePetForCustomer(petId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

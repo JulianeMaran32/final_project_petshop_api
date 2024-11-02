@@ -5,24 +5,25 @@ import br.com.juhmaran.petshop_api.api.common.enums.Species;
 import br.com.juhmaran.petshop_api.api.pet.dtos.PetRequest;
 import br.com.juhmaran.petshop_api.api.pet.dtos.PetResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PetService {
 
-    List<PetResponse> getPets(String name, Boolean castrated, Species species, Gender gender);
+    List<PetResponse> filterPets(Long id, String name, String breed, Species species,
+                                 Gender gender, LocalDateTime createdDate);
 
-    PetResponse createPetForUser(Long userId, PetRequest petRequest);
 
     PetResponse createPet(PetRequest petRequest, String username);
 
-    PetResponse getPetById(Long id);
+    PetResponse createPetForCustomer(PetRequest petRequest);
 
-    PetResponse updatePetById(Long id, PetRequest petRequest);
+    PetResponse updatePet(Long petId, PetRequest petRequest, String username);
 
-    PetResponse patchPetById(Long id, PetRequest petRequest);
+    void deletePet(Long petId, String username);
 
-    void deletePetById(Long id);
+    PetResponse updatePetForCustomer(Long petId, PetRequest petRequest);
 
-    List<PetResponse> getUserPets(String name);
-
+    void deletePetForCustomer(Long petId);
+    
 }

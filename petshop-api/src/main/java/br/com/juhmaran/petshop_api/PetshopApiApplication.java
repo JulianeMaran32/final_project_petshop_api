@@ -1,36 +1,17 @@
 package br.com.juhmaran.petshop_api;
 
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.servers.Server;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import br.com.juhmaran.petshop_api.api.config.FeignConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-@OpenAPIDefinition(
-        info = @Info(
-                title = "Petshop API",
-                version = "1.0",
-                description = "API para gerenciamento de petshops"
-        ),
-        servers = {
-                @Server(
-                        url = "http://localhost:8080",
-                        description = "Servidor local"
-                )
-        },
-        externalDocs = @ExternalDocumentation(
-                description = "Documentação do projeto",
-                url = ""
-        ),
-        tags = {
-                @Tag(name = "Auth", description = "Operações relacionadas a autenticação do usuário"),
-                @Tag(name = "User", description = "Operações relacionadas a usuários")
-        }
-)
-@EnableFeignClients
+@EnableGlobalAuthentication
+@EnableCaching(proxyTargetClass = true)
+@EnableFeignClients(basePackages = "br.com.juhmaran.petshop_api.api.address.clients", defaultConfiguration = FeignConfig.class)
 @SpringBootApplication
 public class PetshopApiApplication {
 

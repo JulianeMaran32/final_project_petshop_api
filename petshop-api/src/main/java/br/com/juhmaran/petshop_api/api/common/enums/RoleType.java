@@ -1,5 +1,6 @@
 package br.com.juhmaran.petshop_api.api.common.enums;
 
+import br.com.juhmaran.petshop_api.core.exceptions.runtimes.PetShopInternalServerErrorException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -46,7 +47,7 @@ public enum RoleType {
                 return roleType;
             }
         }
-        throw new IllegalArgumentException();
+        throw new PetShopInternalServerErrorException("RoleType inválido: " + value);
     }
 
 }

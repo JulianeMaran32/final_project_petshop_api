@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+left to right direction
+skinparam backgroundColor #E0F7FA
+skinparam packageBackgroundColor #B2EBF2
+skinparam packageBorderColor #00796B
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #B2DFDB
+    BorderColor #004D40
+    FontColor #004D40
+}
+hide empty description
+
+actor PetOwner as "👤 PetOwner"
+actor Admin as "👤 Admin"
+actor Staff as "👤 Staff"
+
+package "E-commerce" {
+    PetOwner -> (E-commerce de Produtos)
+    PetOwner -> (Carrinho de Compras)
+    PetOwner -> (Pagamento Online)
+    Admin -> (E-commerce de Produtos)
+    Admin -> (Gerenciamento de Inventário)
+    Admin -> (Relatórios de Vendas)
+    Admin -> (Promoções e Descontos)
+    Staff -> (Gerenciamento de Inventário)
+    Staff -> (Relatórios de Vendas)
+}
+
+note right of PetOwner
+    PetOwner gerencia seus pets e serviços.
+    - Registro de pets
+    - Agendamento de consultas
+    - Histórico de serviços
+end note
+
+note right of Admin
+    Admin gerencia usuários e configurações do sistema.
+    - Gerenciamento de usuários
+    - Configurações do sistema
+end note
+
+note right of Staff
+    Staff auxilia na gestão de usuários e pets.
+    - Auxílio no registro de pets
+    - Auxílio nas consultas
+end note
+
+@enduml

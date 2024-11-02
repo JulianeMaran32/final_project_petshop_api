@@ -1,36 +1,40 @@
 package br.com.juhmaran.petshop_api.api.auth.login.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Data;
 
 import java.util.List;
 
 /**
- * Record que encapsula os dados de uma resposta de autenticação.
- *
- * @param authToken o token de autenticação
- * @param tokenType o tipo do token (por exemplo, Bearer)
- * @param expiresIn o tempo de expiração do token em milissegundos
- * @param username o nome de usuário associado ao token
- * @param name o nome completo do usuário
- * @param roles as funções (roles) atribuídas ao usuário
+ * @author Juliane Maran
  */
-@Schema(description = "Representa uma resposta de autenticação.", name = "TokenResponse")
-public record TokenResponse(
-        @Schema(description = "O token de autenticação.", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-        String authToken,
+@Schema(description = "Representa uma resposta de autenticação, contendo o token de autenticação, " +
+        "tipo de token, tempo de expiração, nome de usuário, nome completo e funções (roles) atribuídas ao usuário.",
+        name = "TokenResponse")
+@Data
+@Builder
+public class TokenResponse {
 
-        @Schema(description = "O tipo do token.", example = "Bearer")
-        String tokenType,
+    @Schema(description = "O token de autenticação, utilizado para acessar recursos protegidos.",
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+    private String authToken;
 
-        @Schema(description = "O tempo de expiração do token em milissegundos.", example = "3600")
-        long expiresIn,
+    @Schema(description = "O tipo do token, geralmente 'Bearer'.", example = "Bearer")
+    private String tokenType;
 
-        @Schema(description = "O nome de usuário associado ao token.", example = "johndoe@email.com")
-        String username,
+    @Schema(description = "O tempo de expiração do token em milissegundos, após o qual o token não será mais válido.",
+            example = "3600")
+    private long expiresIn;
 
-        @Schema(description = "O nome completo do usuário.", example = "John Doe")
-        String name,
+    @Schema(description = "O nome de usuário associado ao token, geralmente o email do usuário.",
+            example = "johndoe@email.com")
+    private String username;
 
-        @Schema(description = "As funções (roles) atribuídas ao usuário.", example = "[\"ADMIN\", \"USER\"]")
-        List<String> roles) {
+    @Schema(description = "O nome completo do usuário associado ao token.", example = "John Doe")
+    private String name;
+
+    @Schema(description = "As funções (roles) atribuídas ao usuário, que determinam suas permissões e acessos.")
+    private List<String> roles;
+
 }

@@ -26,6 +26,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Manipulador global de exceções para a aplicação.
+ *
+ * <p>Esta classe captura e trata exceções lançadas pelos controladores REST,
+ * retornando respostas HTTP apropriadas com mensagens de erro.</p>
+ *
+ * <p><b>Exemplo de uso:</b></p>
+ * <pre>{@code
+ * @RestController
+ * public class ProdutoController {
+ *
+ *     @GetMapping("/produtos/{id}")
+ *     public ResponseEntity<Produto> getProduto(@PathVariable Long id) {
+ *         Produto produto = produtoService.findById(id)
+ *                 .orElseThrow(() -> new PetShopNotFoundException("Produto não encontrado"));
+ *         return ResponseEntity.ok(produto);
+ *     }
+ * }
+ * }</pre>
+ *
+ * <p>Esta classe utiliza o framework Spring para capturar exceções e o Lombok para logging.</p>
+ *
  * @author Juliane Maran
  */
 @Slf4j
@@ -34,7 +55,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        logException("handleValidationExceptions", ex);
+        log.error("Erro: Falha na validação dos campos - {}", ex.getMessage());
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
@@ -51,17 +72,32 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
-        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Parâmetro de solicitação ausente.");
+        log.error("Erro: Parâmetro ausente - {}", ex.getMessage());
+        var errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Parâmetro de solicitação ausente.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Mensagem HTTP não legível.");
+        log.error("Erro: Mensagem HTTP não legível - {}", ex.getMessage());
+        var errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Mensagem HTTP não legível.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex) {
-        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Nenhum manipulador encontrado para a solicitação.");
+        log.error("Erro: Nenhum manipulador encontrado - {}", ex.getMessage());
+        var errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                "Nenhum manipulador encontrado para a solicitação.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -96,7 +132,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServletException.class)
     public ResponseEntity<ErrorResponse> handleServletException(ServletException ex) {
-        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, "Erro no processamento da solicitação.");
+        log.error("Erro: Exceção do Servlet - {}", ex.getMessage());
+        var errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
@@ -111,12 +152,33 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PetShopUnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(PetShopUnauthorizedException ex) {
-        return buildErrorResponse(ex, HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
+        log.error("Erro: Usuário não autenticado - {}", ex.getMessage());
+        var errorResponse = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                "Usuário não autenticado.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(PetshopExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwtException(PetshopExpiredJwtException ex) {
+        log.error("Erro: JWT token expirado - {}", ex.getMessage());
+        var errorResponse = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                "JWT token expirado.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
 
     @ExceptionHandler(PetShopForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenException(PetShopForbiddenException ex) {
-        return buildErrorResponse(ex, HttpStatus.FORBIDDEN, "Usuário não possui permissão");
+        log.error("Erro: Usuário não possui permissão - {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                "Usuário não possui permissão.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(PetShopNotFoundException.class)

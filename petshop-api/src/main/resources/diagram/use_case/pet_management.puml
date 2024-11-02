@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+left to right direction
+skinparam backgroundColor #E0F7FA
+skinparam packageBackgroundColor #B2EBF2
+skinparam packageBorderColor #00796B
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #B2DFDB
+    BorderColor #004D40
+    FontColor #004D40
+}
+hide empty description
+
+actor PetOwner as "👤 PetOwner"
+actor Staff as "👤 Staff"
+
+package "Pet Management" {
+    PetOwner -> (Registro de Pets)
+    Staff -> (Registro de Pets)
+}
+
+note right of PetOwner
+    PetOwner gerencia seus pets e serviços.
+    - Registro de pets
+    - Agendamento de consultas
+    - Histórico de serviços
+end note
+
+note right of Staff
+    Staff auxilia na gestão de usuários e pets.
+    - Auxílio no registro de pets
+    - Auxílio nas consultas
+end note
+
+@enduml

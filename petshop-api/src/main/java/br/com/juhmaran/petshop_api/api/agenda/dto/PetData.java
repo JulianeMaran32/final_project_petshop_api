@@ -1,8 +1,8 @@
 package br.com.juhmaran.petshop_api.api.agenda.dto;
 
 import br.com.juhmaran.petshop_api.api.common.enums.Species;
-import br.com.juhmaran.petshop_api.api.pet.validators.ValidGender;
-import br.com.juhmaran.petshop_api.api.pet.validators.ValidSpecies;
+import br.com.juhmaran.petshop_api.core.validator.annotations.ValidGender;
+import br.com.juhmaran.petshop_api.core.validator.annotations.ValidSpecies;
 import br.com.juhmaran.petshop_api.api.common.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
