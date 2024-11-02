@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+left to right direction
+skinparam backgroundColor #E0F7FA
+skinparam packageBackgroundColor #B2EBF2
+skinparam packageBorderColor #00796B
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #B2DFDB
+    BorderColor #004D40
+    FontColor #004D40
+}
+hide empty description
+
+actor PetOwner as "👤 PetOwner"
+actor Veterinarian as "👤 Veterinarian"
+actor Admin as "👤 Admin"
+actor Staff as "👤 Staff"
+actor Support as "👤 Support"
+
+package "User Management" {
+    PetOwner -> (Registro de Usuário)
+    Veterinarian -> (Registro de Usuário)
+    Admin -> (Registro de Usuário)
+    Staff -> (Registro de Usuário)
+    Support -> (Registro de Usuário)
+}
+
+note right of PetOwner
+    PetOwner gerencia seus pets e serviços.
+    - Registro de pets
+    - Agendamento de consultas
+    - Histórico de serviços
+end note
+
+note right of Veterinarian
+    Veterinarian gerencia compromissos e histórico de serviços.
+    - Visualização de informações do pet
+    - Gerenciamento de consultas
+end note
+
+note right of Admin
+    Admin gerencia usuários e configurações do sistema.
+    - Gerenciamento de usuários
+    - Configurações do sistema
+end note
+
+note right of Staff
+    Staff auxilia na gestão de usuários e pets.
+    - Auxílio no registro de pets
+    - Auxílio nas consultas
+end note
+
+note right of Support
+    Support fornece suporte ao cliente.
+    - Suporte técnico
+    - Atendimento ao cliente
+end note
+
+@enduml

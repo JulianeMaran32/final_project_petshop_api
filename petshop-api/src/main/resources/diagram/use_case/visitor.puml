@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+left to right direction
+skinparam backgroundColor #E0F7FA
+skinparam packageBackgroundColor #B2EBF2
+skinparam packageBorderColor #00796B
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #B2DFDB
+    BorderColor #004D40
+    FontColor #004D40
+}
+hide empty description
+
+actor Visitor as "👤 Visitor"
+
+Visitor -> (Visualizar Produtos e Serviços)
+
+note right of Visitor
+    Visitor pode visualizar produtos e serviços.
+    - Visualização de produtos
+    - Pesquisa de produtos
+end note
+
+@enduml

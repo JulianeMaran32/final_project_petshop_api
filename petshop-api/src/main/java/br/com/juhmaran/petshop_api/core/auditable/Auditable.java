@@ -16,6 +16,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 
 /**
+ * Classe abstrata que adiciona informações de auditoria às entidades.
+ * <p>
+ * Esta classe armazena informações sobre o usuário que criou e atualizou a entidade,
+ * bem como as datas de criação e atualização.
+ * </p>
+ *
+ * <p><b>Exemplo de utilização:</b></p>
+ * <pre>{@code
+ * @Entity
+ * public class Produto extends Auditable {
+ *     @Id
+ *     @GeneratedValue(strategy = GenerationType.IDENTITY)
+ *     private Long id;
+ *
+ *     private String nome;
+ *
+ *     // getters e setters
+ * }
+ * }</pre>
+ *
+ * <p>Esta classe utiliza o framework Spring Security para obter informações do usuário autenticado.</p>
+ *
  * @author Juliane Maran
  */
 @Getter

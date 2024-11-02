@@ -13,6 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
+ * Configuração da API para segurança.
+ * <p>
+ * Esta classe configura os beans necessários para a autenticação e codificação de senhas.
+ * </p>
+ *
  * @author Juliane Maran
  */
 @Slf4j
@@ -22,7 +27,13 @@ public class ApiConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
 
-
+    /**
+     * Cria e configura o bean AuthenticationManager.
+     *
+     * @param http o objeto HttpSecurity
+     * @return o bean AuthenticationManager configurado
+     * @throws Exception se ocorrer um erro durante a configuração
+     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
@@ -33,35 +44,36 @@ public class ApiConfig {
         return authenticationManagerBuilder.build();
     }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//        try {
-//            log.info("Configurando AuthenticationManager");
-//            return authenticationConfiguration.getAuthenticationManager();
-//        } catch (Exception e) {
-//            log.error("Erro ao configurar AuthenticationManager: {}", e.getMessage());
-//            throw new PetShopInternalServerErrorException("Erro ao configurar AuthenticationManager", e);
-//        }
-//    }
-
+    /**
+     * Cria e configura o bean PasswordEncoder.
+     *
+     * @return o bean PasswordEncoder configurado
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        log.info("Configurando PasswordEncoder com BCryptPasswordEncoder");
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Cria e configura o bean DaoAuthenticationProvider.
+     *
+     * @return o bean DaoAuthenticationProvider configurado
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        log.info("Configurando DaoAuthenticationProvider");
-        var authProvider = createDaoAuthenticationProvider();
-        log.info("DaoAuthenticationProvider configurado com sucesso");
-        return authProvider;
+        return createDaoAuthenticationProvider();
     }
 
+    /**
+     * Cria e configura uma instância de DaoAuthenticationProvider.
+     *
+     * @return uma instância de DaoAuthenticationProvider configurada
+     */
     private DaoAuthenticationProvider createDaoAuthenticationProvider() {
         var authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
 }

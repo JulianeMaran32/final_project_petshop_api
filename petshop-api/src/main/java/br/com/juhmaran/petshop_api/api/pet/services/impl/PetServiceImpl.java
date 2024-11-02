@@ -1,6 +1,7 @@
 package br.com.juhmaran.petshop_api.api.pet.services.impl;
 
 import br.com.juhmaran.petshop_api.api.common.enums.Gender;
+import br.com.juhmaran.petshop_api.api.common.enums.RoleType;
 import br.com.juhmaran.petshop_api.api.common.enums.Species;
 import br.com.juhmaran.petshop_api.api.pet.dtos.PetRequest;
 import br.com.juhmaran.petshop_api.api.pet.dtos.PetResponse;
@@ -8,14 +9,16 @@ import br.com.juhmaran.petshop_api.api.pet.entities.PetEntity;
 import br.com.juhmaran.petshop_api.api.pet.mapping.PetMapper;
 import br.com.juhmaran.petshop_api.api.pet.repositories.PetRepository;
 import br.com.juhmaran.petshop_api.api.pet.services.PetService;
-import br.com.juhmaran.petshop_api.api.pet.utils.PetUtil;
 import br.com.juhmaran.petshop_api.api.user.entities.UserEntity;
+import br.com.juhmaran.petshop_api.api.user.repositories.UserRepository;
+import br.com.juhmaran.petshop_api.core.exceptions.runtimes.PetShopNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -23,98 +26,108 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetServiceImpl implements PetService {
 
+    private final UserRepository userRepository;
     private final PetRepository petRepository;
 
+    @Transactional(readOnly = true)
     @Override
-    public List<PetResponse> getPets(String name, Boolean castrated, Species species,
-                                     Gender gender) {
-        return petRepository.findPetsByView(name, castrated, species, gender).stream()
-                .map(pet -> new PetResponse(pet.getId(), pet.getName(), pet.getSpecies(),
-                        pet.getGender(), pet.getCastrated()))
-                .toList();
+    public List<PetResponse> filterPets(Long id, String name, String breed, Species species,
+                                        Gender gender, LocalDateTime createdDate) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = findUserByEmail(username);
+        List<PetEntity> petEntities;
+
+        if (user.getRoles().stream().anyMatch(role -> role.getName().equals(RoleType.CUSTOMER))) {
+            petEntities = petRepository.filterPetsByUser(user.getId(), id, name, breed, species, gender, createdDate);
+        } else {
+            petEntities = petRepository.filterPets(id, name, breed, species, gender, createdDate);
+        }
+
+        return PetMapper.INSTANCE.toPetResponseList(petEntities);
     }
 
-    @Override
-    public PetResponse createPetForUser(Long userId, PetRequest petRequest) {
-        UserEntity user = PetUtil.findUserById(userId);
-        PetEntity petEntity = PetMapper.INSTANCE.toEntity(petRequest);
-        petEntity.setUser(user);
-        PetEntity savedPet = petRepository.save(petEntity);
-        return PetMapper.INSTANCE.toResponse(savedPet);
-    }
-
+    @Transactional
     @Override
     public PetResponse createPet(PetRequest petRequest, String username) {
-        UserEntity user = PetUtil.findUserByEmail(username);
-        PetEntity petEntity = PetMapper.INSTANCE.toEntity(petRequest);
-        petEntity.setUser(user);
-        PetEntity savedPet = petRepository.save(petEntity);
+        UserEntity user = findUserByEmail(username);
+        PetEntity pet = PetMapper.INSTANCE.toEntity(petRequest);
+        pet.setUser(user);
+        PetEntity savedPet = petRepository.save(pet);
         return PetMapper.INSTANCE.toResponse(savedPet);
     }
 
-//    @Override
-//    public PetResponse createPetForAuthenticatedUser(String username, PetRequest petRequest) {
-//        UserEntity user = PetUtil.findUserByEmail(username);
-//        PetEntity petEntity = PetMapper.INSTANCE.toEntity(petRequest);
-//        petEntity.setUser(user);
-//        PetEntity savedPet = petRepository.save(petEntity);
-//        return PetMapper.INSTANCE.toResponse(savedPet);
-//    }
-
+    @Transactional
     @Override
-    public PetResponse getPetById(Long id) {
-        PetEntity petEntity = PetUtil.findPetById(id);
-        return PetMapper.INSTANCE.toResponse(petEntity);
-    }
-
-    @Override
-    public PetResponse updatePetById(Long id, PetRequest petRequest) {
-        PetEntity existingPet = PetUtil.findPetById(id);
-        PetEntity updatedPet = PetMapper.INSTANCE.toEntity(petRequest);
-        updatedPet.setId(existingPet.getId());
-        updatedPet.setUser(existingPet.getUser());
-        PetEntity savedPet = petRepository.save(updatedPet);
+    public PetResponse createPetForCustomer(PetRequest petRequest) {
+        UserEntity user = getUserById(petRequest.getUserId());
+        validateUserIsCustomer(user);
+        PetEntity pet = PetMapper.INSTANCE.toEntity(petRequest);
+        pet.setUser(user);
+        PetEntity savedPet = petRepository.save(pet);
         return PetMapper.INSTANCE.toResponse(savedPet);
     }
 
+    @Transactional
     @Override
-    public PetResponse patchPetById(Long id, PetRequest petRequest) {
-        PetEntity existingPet = PetUtil.findPetById(id);
-        if (petRequest.getName() != null) existingPet.setName(petRequest.getName());
-        if (petRequest.getSpecies() != null) existingPet.setSpecies(petRequest.getSpecies());
-        if (petRequest.getBreed() != null) existingPet.setBreed(petRequest.getBreed());
-        if (petRequest.getBirthDate() != null) existingPet.setBirthDate(petRequest.getBirthDate());
-        if (petRequest.getColor() != null) existingPet.setColor(petRequest.getColor());
-        if (petRequest.getSize() != null) existingPet.setSize(petRequest.getSize());
-        if (petRequest.getGender() != null) existingPet.setGender(petRequest.getGender());
-        if (petRequest.getCastrated() != null) existingPet.setCastrated(petRequest.getCastrated());
-        if (petRequest.getWeight() != 0) existingPet.setWeight(petRequest.getWeight());
-        if (petRequest.getHealthHistory() != null) existingPet.setHealthHistory(petRequest.getHealthHistory());
-        PetEntity savedPet = petRepository.save(existingPet);
-        return PetMapper.INSTANCE.toResponse(savedPet);
+    public PetResponse updatePet(Long petId, PetRequest petRequest, String username) {
+        UserEntity user = findUserByEmail(username);
+        PetEntity pet = getPetEntity(petId, user);
+        PetMapper.INSTANCE.updateEntityFromRequest(petRequest, pet);
+        PetEntity updatedPet = petRepository.save(pet);
+        return PetMapper.INSTANCE.toResponse(updatedPet);
     }
 
+    @Transactional
     @Override
-    public void deletePetById(Long id) {
-        PetEntity petEntity = PetUtil.findPetById(id);
-        petRepository.delete(petEntity);
+    public void deletePet(Long petId, String username) {
+        UserEntity user = findUserByEmail(username);
+        PetEntity pet = getPetEntity(petId, user);
+        petRepository.delete(pet);
     }
 
+    @Transactional
     @Override
-    public List<PetResponse> getUserPets(String username) {
-        UserEntity user = PetUtil.findUserByEmail(username);
-        return petRepository.findByUser(user).stream()
-                .map(PetMapper.INSTANCE::toResponse)
-                .toList();
+    public PetResponse updatePetForCustomer(Long petId, PetRequest petRequest) {
+        PetEntity pet = getPetEntity(petId);
+        PetMapper.INSTANCE.updateEntityFromRequest(petRequest, pet);
+        PetEntity updatedPet = petRepository.save(pet);
+        return PetMapper.INSTANCE.toResponse(updatedPet);
     }
 
-    public boolean isPetOwner(Authentication authentication, Long petId) {
-        String username = authentication.getName();
-        PetEntity pet = PetUtil.findPetById(petId);
-        if (!pet.getUser().getEmail().equals(username)) {
-            throw new AccessDeniedException("User does not have permission to access this pet");
+    @Transactional
+    @Override
+    public void deletePetForCustomer(Long petId) {
+        PetEntity pet = getPetEntity(petId);
+        petRepository.delete(pet);
+    }
+
+    private void validateUserIsCustomer(UserEntity user) {
+        boolean isCustomer = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equals(RoleType.CUSTOMER));
+        if (!isCustomer) {
+            throw new RuntimeException("O usuário especificado não é um CUSTOMER");
         }
-        return true;
+    }
+
+    private UserEntity findUserByEmail(String username) {
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new PetShopNotFoundException("Email não encontrado."));
+    }
+
+    private UserEntity getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new PetShopNotFoundException("Usuário não encontrado."));
+    }
+
+
+    private PetEntity getPetEntity(Long petId, UserEntity user) {
+        return petRepository.findByIdAndUserId(petId, user.getId())
+                .orElseThrow(() -> new PetShopNotFoundException("Pet não encontrado ou não pertence ao usuário."));
+    }
+
+    private PetEntity getPetEntity(Long petId) {
+        return petRepository.findById(petId)
+                .orElseThrow(() -> new PetShopNotFoundException("Pet não encontrado."));
     }
 
 }

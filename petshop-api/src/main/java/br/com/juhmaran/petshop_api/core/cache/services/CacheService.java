@@ -1,37 +1,49 @@
-package br.com.juhmaran.petshop_api.core.cache;
+package br.com.juhmaran.petshop_api.core.cache.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Juliane Maran
+ * Serviço para operações de cache.
+ * <p>
+ * Esta classe lida com a lógica de recuperação de entradas de cache.
+ * </p>
+ * <p>Responsabilidade: Recuperar entradas de cache.</p>
+ * <p>Princípio da Responsabilidade Única: Esta classe lida apenas com a recuperação de entradas de cache.</p>
+ * <p>Autor: Juliane Maran</p>
  */
 @Slf4j
-@RestController
-@RequestMapping("/cache")
+@Service
 @RequiredArgsConstructor
-public class CacheController {
+public class CacheService {
 
     private final CacheManager cacheManager;
 
-    @GetMapping("/contents")
+    /**
+     * Recupera o conteúdo do cache.
+     *
+     * @return um mapa contendo os nomes dos caches e suas respectivas entradas
+     */
     public Map<String, Object> getCacheContents() {
         Map<String, Object> cacheContents = new HashMap<>();
         for (String cacheName : cacheManager.getCacheNames()) {
             cacheContents.put(cacheName, getCacheEntries(cacheName));
         }
-        log.info("Conteúdo do cache recuperado com sucesso.");
         return cacheContents;
     }
 
+    /**
+     * Recupera as entradas de um cache específico.
+     *
+     * @param cacheName o nome do cache
+     * @return um mapa contendo as entradas do cache
+     */
     private Map<Object, Object> getCacheEntries(String cacheName) {
         Map<Object, Object> cacheEntries = new HashMap<>();
         Cache cache = cacheManager.getCache(cacheName);

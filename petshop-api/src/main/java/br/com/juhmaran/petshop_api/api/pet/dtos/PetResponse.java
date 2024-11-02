@@ -53,12 +53,4 @@ public class PetResponse {
     @Schema(name = "userId", description = "ID do usuário dono do Pet.", example = "1")
     private Long userId;
 
-    public PetResponse(Long id, String name, Species species, Gender gender, Boolean castrated) {
-        this.id = id;
-        this.name = name;
-        this.species = species;
-        this.gender = gender;
-        this.castrated = castrated;
-    }
-
 }

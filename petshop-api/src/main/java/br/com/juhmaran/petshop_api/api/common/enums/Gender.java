@@ -1,5 +1,6 @@
 package br.com.juhmaran.petshop_api.api.common.enums;
 
+import br.com.juhmaran.petshop_api.core.exceptions.runtimes.PetShopInternalServerErrorException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public enum Gender {
                 return gender;
             }
         }
-        throw new IllegalArgumentException();
+        throw new PetShopInternalServerErrorException("Dados inválidos.");
     }
 
 }
