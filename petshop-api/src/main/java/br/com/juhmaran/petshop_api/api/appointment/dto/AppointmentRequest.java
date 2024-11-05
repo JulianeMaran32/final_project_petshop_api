@@ -1,8 +1,9 @@
-package br.com.juhmaran.petshop_api.api.appointment;
+package br.com.juhmaran.petshop_api.api.appointment.dto;
 
 import br.com.juhmaran.petshop_api.core.customize.deserializer.CustomLocalDateDeserializer;
 import br.com.juhmaran.petshop_api.core.customize.deserializer.CustomLocalTimeDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import java.time.LocalTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(name = "AppointmentRequest", description = "Requisição de Agendamento")
 public class AppointmentRequest {
 
     @NotNull(message = "O campo petId é obrigatório")

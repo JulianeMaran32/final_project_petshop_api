@@ -1,5 +1,8 @@
-package br.com.juhmaran.petshop_api.api.appointment;
+package br.com.juhmaran.petshop_api.api.appointment.mapping;
 
+import br.com.juhmaran.petshop_api.api.appointment.dto.AppointmentRequest;
+import br.com.juhmaran.petshop_api.api.appointment.dto.AppointmentResponse;
+import br.com.juhmaran.petshop_api.api.appointment.entities.AppointmentEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

@@ -1,5 +1,9 @@
-package br.com.juhmaran.petshop_api.api.appointment;
+package br.com.juhmaran.petshop_api.api.appointment.controller;
 
+import br.com.juhmaran.petshop_api.api.appointment.dto.AppointmentRequest;
+import br.com.juhmaran.petshop_api.api.appointment.dto.AppointmentResponse;
+import br.com.juhmaran.petshop_api.api.appointment.service.AppointmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/appointments")
 @RequiredArgsConstructor
+@Tag(name = "Appointments", description = "Operações relacionadas ao Agendamento de Consultas Veterinárias")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;

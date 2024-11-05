@@ -1,4 +1,4 @@
-package br.com.juhmaran.petshop_api.api.appointment;
+package br.com.juhmaran.petshop_api.api.appointment.entities;
 
 import br.com.juhmaran.petshop_api.api.pet.entities.PetEntity;
 import br.com.juhmaran.petshop_api.core.auditable.Auditable;

@@ -1,8 +1,9 @@
-package br.com.juhmaran.petshop_api.api.appointment;
+package br.com.juhmaran.petshop_api.api.appointment.dto;
 
 import br.com.juhmaran.petshop_api.core.customize.serializer.CustomLocalDateSerializer;
 import br.com.juhmaran.petshop_api.core.customize.serializer.CustomLocalTimeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.LocalTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(name = "AppointmentResponse", description = "Resposta de Agendamento")
 public class AppointmentResponse {
 
     private Long id;

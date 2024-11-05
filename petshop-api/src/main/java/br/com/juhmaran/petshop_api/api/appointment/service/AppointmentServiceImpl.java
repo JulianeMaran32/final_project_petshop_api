@@ -1,5 +1,10 @@
-package br.com.juhmaran.petshop_api.api.appointment;
+package br.com.juhmaran.petshop_api.api.appointment.service;
 
+import br.com.juhmaran.petshop_api.api.appointment.dto.AppointmentRequest;
+import br.com.juhmaran.petshop_api.api.appointment.dto.AppointmentResponse;
+import br.com.juhmaran.petshop_api.api.appointment.entities.AppointmentEntity;
+import br.com.juhmaran.petshop_api.api.appointment.mapping.AppointmentMapper;
+import br.com.juhmaran.petshop_api.api.appointment.repositories.AppointmentRepository;
 import br.com.juhmaran.petshop_api.api.common.enums.RoleType;
 import br.com.juhmaran.petshop_api.api.pet.entities.PetEntity;
 import br.com.juhmaran.petshop_api.api.pet.repositories.PetRepository;
