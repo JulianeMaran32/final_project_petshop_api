@@ -4,6 +4,7 @@ import br.com.juhmaran.petshop_api.api.auth.login.dtos.LoginRequest;
 import br.com.juhmaran.petshop_api.api.auth.login.dtos.TokenResponse;
 import br.com.juhmaran.petshop_api.api.auth.login.services.AuthService;
 import br.com.juhmaran.petshop_api.api.user.dto.response.UserResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "Operações relacionadas a Autenticação")
 public class AuthController {
 
     private final AuthService authService;
