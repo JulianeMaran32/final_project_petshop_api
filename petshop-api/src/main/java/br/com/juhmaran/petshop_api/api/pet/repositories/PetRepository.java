@@ -5,6 +5,7 @@ import br.com.juhmaran.petshop_api.api.common.enums.Species;
 import br.com.juhmaran.petshop_api.api.pet.entities.PetEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
@@ -43,4 +44,8 @@ public interface PetRepository extends JpaRepository<PetEntity, Long> {
                                      @Param("species") Species species,
                                      @Param("gender") Gender gender,
                                      @Param("createdDate") LocalDateTime createdDate);
+
+    @Procedure(procedureName = "sp_pet_statistics")
+    List<Object[]> getPetStatistics();
+
 }

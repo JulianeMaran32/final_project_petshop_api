@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(name = "PetResponse", description = "Resposta de Pet.")
 public class PetResponse {
 
     @Schema(name = "id", description = "ID do Pet.", example = "1")

@@ -11,6 +11,7 @@ import br.com.juhmaran.petshop_api.api.pet.repositories.PetRepository;
 import br.com.juhmaran.petshop_api.api.pet.services.PetService;
 import br.com.juhmaran.petshop_api.api.user.entities.UserEntity;
 import br.com.juhmaran.petshop_api.api.user.repositories.UserRepository;
+import br.com.juhmaran.petshop_api.core.exceptions.runtimes.PetShopInternalServerErrorException;
 import br.com.juhmaran.petshop_api.core.exceptions.runtimes.PetShopNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,18 @@ public class PetServiceImpl implements PetService {
 
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+
+    @Transactional(readOnly = true)
+    @Override
+    public PetResponse findById(Long id) {
+        log.debug("Iniciando busca pelo pet com ID: {}", id);
+        PetEntity petEntities = petRepository.findById(id).orElseThrow(() -> {
+            log.warn("Pet com ID: {} não encontrado", id);
+            return new PetShopNotFoundException("Pet não encontrado.");
+        });
+        log.info("Pet com ID: {} encontrado com sucesso", id);
+        return PetMapper.INSTANCE.toResponse(petEntities);
+    }
 
     @Transactional(readOnly = true)
     @Override
@@ -105,7 +118,7 @@ public class PetServiceImpl implements PetService {
         boolean isCustomer = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equals(RoleType.CUSTOMER));
         if (!isCustomer) {
-            throw new RuntimeException("O usuário especificado não é um CUSTOMER");
+            throw new PetShopInternalServerErrorException("O usuário especificado não é um CUSTOMER");
         }
     }
 

@@ -13,6 +13,7 @@ public interface PetService {
     List<PetResponse> filterPets(Long id, String name, String breed, Species species,
                                  Gender gender, LocalDateTime createdDate);
 
+    PetResponse findById(Long id);
 
     PetResponse createPet(PetRequest petRequest, String username);
 
@@ -25,5 +26,5 @@ public interface PetService {
     PetResponse updatePetForCustomer(Long petId, PetRequest petRequest);
 
     void deletePetForCustomer(Long petId);
-    
+
 }
