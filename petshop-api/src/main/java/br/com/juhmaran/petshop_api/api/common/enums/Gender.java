@@ -4,7 +4,9 @@ import br.com.juhmaran.petshop_api.core.exceptions.runtimes.PetShopInternalServe
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 public enum Gender {
 
@@ -26,7 +28,8 @@ public enum Gender {
                 return gender;
             }
         }
-        throw new PetShopInternalServerErrorException("Dados inválidos.");
+        log.error("Valor inválido para Gênero: {}", value);
+        throw new PetShopInternalServerErrorException("[Gender] - Dados inválidos.");
     }
 
 }
