@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * @author Juliane Maran
- */
 @Getter
 @AllArgsConstructor
 @Schema(name = "ErrorResponse", description = "Classe que representa a resposta de erro.")

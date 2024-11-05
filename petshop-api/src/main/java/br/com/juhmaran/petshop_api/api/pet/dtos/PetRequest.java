@@ -2,8 +2,10 @@ package br.com.juhmaran.petshop_api.api.pet.dtos;
 
 import br.com.juhmaran.petshop_api.api.common.enums.Gender;
 import br.com.juhmaran.petshop_api.api.common.enums.Species;
+import br.com.juhmaran.petshop_api.core.customize.deserializer.CustomLocalDateDeserializer;
 import br.com.juhmaran.petshop_api.core.validator.annotations.ValidGender;
 import br.com.juhmaran.petshop_api.core.validator.annotations.ValidSpecies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(name = "PetRequest", description = "Requisição de Pet.")
 public class PetRequest {
 
     @Schema(name = "name", maxLength = 50, requiredMode = Schema.RequiredMode.REQUIRED,
@@ -35,6 +38,7 @@ public class PetRequest {
 
     @Schema(name = "birthDate", description = "Data de nascimento do Pet.", example = "2021-01-01")
     @PastOrPresent(message = "Data de nascimento inválida.")
+    @JsonDeserialize(using = CustomLocalDateDeserializer.class)
     private LocalDate birthDate;
 
     @Schema(name = "color", maxLength = 50, description = "Cor do Pet.", example = "Marrom")

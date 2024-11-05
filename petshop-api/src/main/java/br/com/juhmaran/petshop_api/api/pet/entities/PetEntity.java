@@ -73,5 +73,4 @@ public class PetEntity extends Auditable implements Serializable {
     @Column(name = "updated_date", nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedDate;
 
-
 }

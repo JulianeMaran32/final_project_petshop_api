@@ -8,11 +8,24 @@ import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Decodificador de erros personalizado para lidar com respostas de erro do Feign.
+ * <p>
+ * Esta classe implementa a interface {@link feign.codec.ErrorDecoder} e fornece
+ * uma lógica personalizada para decodificar respostas de erro HTTP.
+ * </p>
+ *
  * @author Juliane Maran
  */
 @Slf4j
 public class CustomErrorDecoder implements ErrorDecoder {
 
+    /**
+     * Decodifica a resposta de erro HTTP e retorna uma exceção apropriada.
+     *
+     * @param methodKey a chave do metodo que foi chamado
+     * @param response  a resposta HTTP recebida
+     * @return uma exceção que representa o erro
+     */
     @Override
     public Exception decode(String methodKey, Response response) {
         log.error("Erro ao chamar o método {}: status {}, motivo {}", methodKey, response.status(), response.reason());
@@ -26,5 +39,4 @@ public class CustomErrorDecoder implements ErrorDecoder {
             default -> new Exception("Ocorreu um erro inesperado. Por favor, tente novamente.");
         };
     }
-
 }

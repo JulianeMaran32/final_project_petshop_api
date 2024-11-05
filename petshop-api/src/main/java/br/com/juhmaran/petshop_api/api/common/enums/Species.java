@@ -4,7 +4,9 @@ import br.com.juhmaran.petshop_api.core.exceptions.runtimes.PetShopInternalServe
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 public enum Species {
 
@@ -24,13 +26,14 @@ public enum Species {
     }
 
     @JsonCreator
-    public static ProfessionalInfo fromString(String value) {
-        for (ProfessionalInfo professionalInfo : ProfessionalInfo.values()) {
-            if (professionalInfo.name().equalsIgnoreCase(value)) {
-                return professionalInfo;
+    public static Species fromString(String value) {
+        for (Species species : Species.values()) {
+            if (species.name().equalsIgnoreCase(value)) {
+                return species;
             }
         }
-        throw new PetShopInternalServerErrorException("Dados inválidos.");
+        log.error("Valor inválido para Espécie: {}", value);
+        throw new PetShopInternalServerErrorException("[Species] - Dados inválidos.");
     }
 
 }

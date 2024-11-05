@@ -1,6 +1,7 @@
 package br.com.juhmaran.petshop_api.api.auth.password.controllers;
 
 import br.com.juhmaran.petshop_api.api.auth.password.services.PasswordService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Password", description = "Operações relacionadas a Redefinição de Senha")
 public class PasswordController {
 
     private final PasswordService passwordResetService;

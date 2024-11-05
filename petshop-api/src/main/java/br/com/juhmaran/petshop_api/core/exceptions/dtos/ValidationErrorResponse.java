@@ -5,9 +5,6 @@ import lombok.Getter;
 
 import java.util.Map;
 
-/**
- * @author Juliane Maran
- */
 @Getter
 @Schema(name = "ValidationErrorResponse", description = "Classe que representa a resposta de erro de validação.")
 public class ValidationErrorResponse extends ErrorResponse {

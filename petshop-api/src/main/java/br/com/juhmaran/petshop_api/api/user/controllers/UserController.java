@@ -4,6 +4,7 @@ import br.com.juhmaran.petshop_api.api.user.dto.request.UserRegistrationRequest;
 import br.com.juhmaran.petshop_api.api.user.dto.request.UserUpdateRequest;
 import br.com.juhmaran.petshop_api.api.user.dto.response.UserResponse;
 import br.com.juhmaran.petshop_api.api.user.services.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "Operações relacionadas ao Usuário")
 public class UserController {
 
     private final UserService userService;

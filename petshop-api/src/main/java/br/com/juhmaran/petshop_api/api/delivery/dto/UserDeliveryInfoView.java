@@ -7,29 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Mapeia os campos da view user_delivery_info
- */
-//@SqlResultSetMapping(
-//        name = "UserDeliveryInfoMapping",
-//        classes = @ConstructorResult(
-//                targetClass = UserDeliveryInfo.class,
-//                columns = {
-//                        @ColumnResult(name = "user_id", type = Long.class),
-//                        @ColumnResult(name = "user_name", type = String.class),
-//                        @ColumnResult(name = "user_email", type = String.class),
-//                        @ColumnResult(name = "user_phone", type = String.class),
-//                        @ColumnResult(name = "street", type = String.class),
-//                        @ColumnResult(name = "complement", type = String.class),
-//                        @ColumnResult(name = "unit", type = String.class),
-//                        @ColumnResult(name = "neighborhood", type = String.class),
-//                        @ColumnResult(name = "city", type = String.class),
-//                        @ColumnResult(name = "state", type = String.class),
-//                        @ColumnResult(name = "country", type = String.class),
-//                        @ColumnResult(name = "zip_code", type = String.class)
-//                }
-//        )
-//)
 @Entity
 @Getter
 @Setter

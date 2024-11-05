@@ -20,12 +20,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/addresses")
 @RequiredArgsConstructor
-@Tag(name = "Endereço", description = "Endpoints para gerenciamento de endereços")
+@Tag(name = "Address", description = "Endpoints para gerenciamento de endereços")
 public class AddressController {
 
     private final AddressService addressService;
 
-    @Operation(summary = "Obter endereço por CEP", operationId = "getAddressByCep", tags = {"Endereço"},
+    @Operation(summary = "Obter endereço por CEP", operationId = "getAddressByCep", tags = {"Address"},
             description = "Recuperar detalhes do endereço pelo CEP")
     @ApiResponse(responseCode = "200", description = "Endereço encontrado",
             content = @Content(schema = @Schema(implementation = AddressResponse.class)))
@@ -41,7 +41,7 @@ public class AddressController {
         return ResponseEntity.ok(addressResponseDTO);
     }
 
-    @Operation(summary = "Buscar endereços", operationId = "getAddressByDetails", tags = {"Endereço"},
+    @Operation(summary = "Buscar endereços", operationId = "getAddressByDetails", tags = {"Address"},
             description = "Buscar endereços por UF, cidade e rua")
     @ApiResponse(responseCode = "200", description = "Endereços encontrados",
             content = @Content(schema = @Schema(implementation = AddressResponse.class)))
@@ -59,7 +59,7 @@ public class AddressController {
         return ResponseEntity.ok(addressResponseDTOs);
     }
 
-    @Operation(summary = "Criar um novo endereço", operationId = "createAddress", tags = {"Endereço"},
+    @Operation(summary = "Criar um novo endereço", operationId = "createAddress", tags = {"Address"},
             description = "Criar uma nova entrada de endereço", security = {@SecurityRequirement(name = "bearer")})
     @ApiResponse(responseCode = "201", description = "Endereço criado",
             content = @Content(schema = @Schema(implementation = AddressResponse.class)))
@@ -76,7 +76,7 @@ public class AddressController {
         return ResponseEntity.ok(addressResponseDTO);
     }
 
-    @Operation(summary = "Atualizar um endereço", operationId = "updateAddress", tags = {"Endereço"},
+    @Operation(summary = "Atualizar um endereço", operationId = "updateAddress", tags = {"Address"},
             description = "Atualizar um endereço existente pelo ID", security = {@SecurityRequirement(name = "bearer")})
     @ApiResponse(responseCode = "200", description = "Endereço atualizado",
             content = @Content(schema = @Schema(implementation = AddressResponse.class)))
@@ -96,7 +96,7 @@ public class AddressController {
         return ResponseEntity.ok(addressResponseDTO);
     }
 
-    @Operation(summary = "Excluir um endereço", operationId = "deleteAddress", tags = {"Endereço"},
+    @Operation(summary = "Excluir um endereço", operationId = "deleteAddress", tags = {"Address"},
             description = "Excluir um endereço pelo ID", security = {@SecurityRequirement(name = "bearer")})
     @ApiResponse(responseCode = "204", description = "Endereço excluído")
     @ApiResponse(responseCode = "401", description = "Não autorizado",

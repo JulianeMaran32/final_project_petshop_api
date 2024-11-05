@@ -1,14 +1,12 @@
 package br.com.juhmaran.petshop_api.api.auth.password.entities;
 
 import br.com.juhmaran.petshop_api.api.user.entities.UserEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SourceType;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -25,6 +23,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "password_reset_token")
+@Schema(name = "PasswordResetToken", description = "Representa um token de redefinição de senha.")
 public class PasswordResetTokenEntity implements Serializable {
 
     @Id
