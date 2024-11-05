@@ -87,7 +87,13 @@ public class SecurityConfiguration {
                     .requestMatchers(URL_AUTH).permitAll()
                     .requestMatchers(URL_CONTACT).permitAll()
                     .requestMatchers(HttpMethod.GET, URL_CACHE).permitAll()
-                    .requestMatchers(HttpMethod.POST, "/pets/register").hasRole("CUSTOMER")
+//                    .requestMatchers(HttpMethod.POST, "/pets").hasRole("CUSTOMER")
+//                    .requestMatchers(HttpMethod.PUT, "/pets/**").hasRole("CUSTOMER")
+//                    .requestMatchers(HttpMethod.DELETE, "/pets/**").hasRole("CUSTOMER")
+//                    .requestMatchers(HttpMethod.POST, "/pets/admin").hasAnyRole("SUPER_ADMIN", "ADMIN")
+//                    .requestMatchers(HttpMethod.PUT, "/pets/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+//                    .requestMatchers(HttpMethod.DELETE, "/pets/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                    .requestMatchers("/pets/admin/statistics").hasAnyRole("SUPER_ADMIN", "ADMIN")
                     .anyRequest().authenticated();
         });
 
@@ -119,7 +125,8 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(LOCALHOST_4200, LOCALHOST_9090, VIA_CEP, AZURE_API));
+        configuration.setAllowedOrigins(Arrays.asList(
+                LOCALHOST_4200, LOCALHOST_9090, VIA_CEP, AZURE_APP_FRONTEND, AZURE_API_BACKEND));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(AUTHORIZATION, CONTENT_TYPE, ACCEPT_LANGUAGE, X_CSRF_TOKEN));
         configuration.setExposedHeaders(Arrays.asList(AUTHORIZATION, CONTENT_TYPE, ACCEPT_LANGUAGE, X_CSRF_TOKEN));
